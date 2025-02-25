@@ -15,7 +15,6 @@ clean:
 	rm -rf dist
 
 bootstrap: _virtualenv jq.c
-	_virtualenv/bin/pip install -e .
 ifneq ($(wildcard test-requirements.txt),)
 	_virtualenv/bin/pip install -r test-requirements.txt
 endif
@@ -23,10 +22,12 @@ endif
 
 _virtualenv:
 	python3 -m venv _virtualenv
+	# Don't upgrade pip on GraalPy, see https://github.com/oracle/graalpython/blob/master/docs/contributor/IMPLEMENTATION_DETAILS.md#patching-of-packages
+ifneq ($(wildcard _virtualenv/bin/graalpy),)
 	_virtualenv/bin/pip install --upgrade pip
 	_virtualenv/bin/pip install --upgrade setuptools
 	_virtualenv/bin/pip install --upgrade wheel
+endif
 
 jq.c: _virtualenv jq.pyx
-	_virtualenv/bin/pip install cython==3.0.10
-	_virtualenv/bin/cython jq.pyx
+	_virtualenv/bin/pip install -e .
