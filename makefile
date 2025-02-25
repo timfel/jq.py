@@ -22,9 +22,12 @@ endif
 
 _virtualenv:
 	python3 -m venv _virtualenv
+	# Don't upgrade pip on GraalPy, see https://github.com/oracle/graalpython/blob/master/docs/contributor/IMPLEMENTATION_DETAILS.md#patching-of-packages
+ifneq ($(wildcard _virtualenv/bin/graalpy),)
 	_virtualenv/bin/pip install --upgrade pip
 	_virtualenv/bin/pip install --upgrade setuptools
 	_virtualenv/bin/pip install --upgrade wheel
+endif
 
 jq.c: _virtualenv jq.pyx
 	_virtualenv/bin/pip install -e .
