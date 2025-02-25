@@ -94,6 +94,15 @@ else:
         os.path.join(jq_lib_dir, "modules/oniguruma/src/.libs/libonig.a"),
     ]
 
+
+if sys.implementation.name == 'graalpy':
+    try:
+        from Cython.Compile import Main
+        shutil.copy(Main.compile_single(_path_in_dir("jq.pyx")).c_file, _path_in_dir("jq.c"))
+    except ImportError:
+        pass
+
+
 jq_extension = Extension(
     "jq",
     sources=["jq.c"],

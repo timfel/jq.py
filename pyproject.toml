@@ -2,6 +2,7 @@
 requires = [
     "setuptools>=43",
     "wheel",
+    "Cython==3.0.10;implementation_name == 'graalpy'",
 ]
 build-backend = "setuptools.build_meta"
 
