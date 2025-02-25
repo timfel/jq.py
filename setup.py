@@ -95,22 +95,25 @@ else:
     ]
 
 
-if sys.implementation.name == 'graalpy':
-    try:
-        from Cython.Compile import Main
-        shutil.copy(Main.compile_single(_path_in_dir("jq.pyx")).c_file, _path_in_dir("jq.c"))
-    except ImportError:
-        pass
+try:
+    # Follow recommendation from https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules
+    from Cython.Build import cythonize
+except ImportError:
+    cythonize = lambda o: o
+    ext = ".c"
+else:
+    ext = ".pyx"
 
 
 jq_extension = Extension(
     "jq",
-    sources=["jq.c"],
+    sources=[_path_in_dir(f"jq{ext}")],
     define_macros=[("MS_WIN64" , 1)] if os.name == "nt" and sys.maxsize > 2**32  else None, # https://github.com/cython/cython/issues/2670
     include_dirs=[os.path.join(jq_lib_dir, "src")],
     extra_link_args=["-lm"] + (["-Wl,-Bstatic", "-lpthread", "-lshlwapi", "-static-libgcc"] if os.name == 'nt' else []) + link_args_deps,
     extra_objects=extra_objects,
 )
+
 
 setup(
     name='jq',
@@ -121,7 +124,7 @@ setup(
     url='https://github.com/mwilliamson/jq.py',
     python_requires='>=3.6',
     license='BSD 2-Clause',
-    ext_modules = [jq_extension],
+    ext_modules = cythonize([jq_extension]),
     cmdclass={"build_ext": jq_build_ext},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
