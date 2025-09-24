@@ -90,7 +90,7 @@ jobs:
           CIBW_ARCHS_LINUX: "auto aarch64"
           CIBW_ARCHS_MACOS: "auto"
           CIBW_ENABLE: "pypy graalpy"
-          CIBW_SKIP: "cp36-win_amd64 cp36-win32 pp*-win_amd64 pp*-win32 pp38-* gp311* gp*-win_amd64"
+          CIBW_SKIP: "cp36-win_amd64 cp36-win32 pp*-win_amd64 pp*-win32 pp38-* gp311*"
         run: |
           MATRIX=$(
             {
@@ -153,6 +153,7 @@ jobs:
       env:
         CIBW_ENVIRONMENT: ${{ runner.os == 'Windows' && matrix.arch == 'x86' && 'CC=i686-w64-mingw32-gcc.exe' || '' }}
         CIBW_ENABLE: "pypy graalpy"
+        PIP_PROGRESS_BAR: "off"
 
     - uses: actions/upload-artifact@v4
       if: steps.should-build-wheel.outputs.true
